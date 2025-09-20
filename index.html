@@ -207,11 +207,13 @@
     <p><b>Upload Payment Screenshot:</b></p>
     <input type="file" id="payment-screenshot" accept="image/*"><br><br>
     <img id="screenshot-preview" src="" style="max-width:100%; display:none; border:1px solid #ccc; margin-top:10px;">
-
     <br>
-    <button id="confirm-payment">I’ve Paid</button>
-    <br><br>
-    <button onclick="document.getElementById('checkout-modal').style.display='none'">Close</button>
+<button id="download-pdf" style="display:none;">Download PDF</button>
+<br><br>
+<button id="confirm-payment">Click here to go to WhatsApp and attach your screenshot</button>
+<br><br>
+<button onclick="document.getElementById('checkout-modal').style.display='none'">Close</button>
+
   </div>
 </div>
 
@@ -242,6 +244,7 @@
 
     <div class="footer3">Copyright © <h4>HAYMOSH</h4> 2025</div>
   </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
   <script src="script.js"></script>
 

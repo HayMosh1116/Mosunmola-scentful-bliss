@@ -101,9 +101,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let cart = []; // { id: "0", name, price: number, quantity: number }
 
   function formatMoney(n) {
-  // round down to thousands and add 'k'
-  return `₦${Math.round(n / 1000)}k`;
+  if (n >= 1000) {
+    return `₦${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+  }
+  return `₦${n}`;
 }
+
 
 
 
@@ -261,25 +264,63 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // confirm payment -> open WhatsApp with order summary
-  if (confirmPaymentBtn) {
-    confirmPaymentBtn.addEventListener("click", () => {
-      if (cart.length === 0) {
-        alert("No items in cart.");
-        return;
-      }
-      const orderSummary = cart
-        .map((it, i) => `${i + 1}. ${it.name} - ${formatMoney(it.price)} x${it.quantity}`)
-        .join("\n");
-      const total = cart.reduce((s, it) => s + it.price * it.quantity, 0);
-      const screenshotFile = screenshotInput?.files?.[0]?.name || "No screenshot uploaded";
+  document.getElementById("confirm-payment").addEventListener("click", () => {
+  let summary = "🛒 Your Order Summary:\n\n";
 
-      const message = `Hello, I’ve made a payment.\n\nMy Order:\n${orderSummary}\n\nTotal: ${formatMoney(total)}\n\nScreenshot file: ${screenshotFile}\n(Please attach the screenshot in WhatsApp if it didn't attach automatically.)`;
+  cart.forEach(item => {
+    summary += `- ${item.quantity}x ${item.name} = ${formatMoney(item.price * item.quantity)}\n`;
+  });
 
-      const whatsappNumber = "2349013921076"; // <- replace with your number
-      const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappURL, "_blank");
-    });
+  summary += `\nTotal: ${formatMoney(cart.reduce((s, it) => s + it.price * it.quantity, 0))}`;
+  summary += `\n\n✅ Please attach your payment screenshot here.`;
+
+  const whatsappNumber = "2349013921076"; // <-- replace with your number
+  const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(summary)}`;
+
+  window.open(url, "_blank");
+});
+
+// Preview uploaded screenshot
+document.getElementById("payment-screenshot").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const img = document.getElementById("screenshot-preview");
+      img.src = event.target.result;
+      img.style.display = "block";
+
+      // Show the "Download PDF" button once image is uploaded
+      document.getElementById("download-pdf").style.display = "inline-block";
+    };
+    reader.readAsDataURL(file);
   }
+});
+
+document.getElementById("download-pdf").addEventListener("click", () => {
+  const img = document.getElementById("screenshot-preview");
+  if (!img.src) {
+    alert("Please upload a screenshot first.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p", "mm", "a4"); // portrait, millimeters, A4
+
+  // Get page width
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+
+  // Adjust image size
+  const imgWidth = pageWidth - 20; // leave margins
+  const imgHeight = (img.naturalHeight / img.naturalWidth) * imgWidth;
+
+  pdf.addImage(img.src, "PNG", 10, 10, imgWidth, imgHeight);
+
+  pdf.save("payment-proof.pdf");
+});
+
+
 
   // initial update
   updateCartCountAndTotal();

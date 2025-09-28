@@ -7,17 +7,43 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Page fade-in effect */
 body {
-  opacity: 0;
-  transition: opacity 0.8s ease-in-out;
-  background-color: #bcccdc;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(
+      rgba(0, 0, 0, 0.4), 
+      rgba(0, 0, 0, 0.6)
+    ),
+    url("perfume-1794111_1280.jpg"); 
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  animation: bgMove 20s linear infinite, bgZoom 20s ease-in-out infinite ;
+  font-family: "Poppins", sans-serif;
+  color: #fff;
 }
+
+@keyframes bgMove {
+  0%   { background-position: left top; }
+  25%  { background-position: right top; }
+  50%  { background-position: right bottom; }
+  75%  { background-position: left bottom; }
+  100% { background-position: left top; }
+}
+
+
+@keyframes bgZoom {
+  0%, 100% { background-size: 100% 100%; }
+  50%      { background-size: 110% 110%; }
+
+}
+
 
 body.fade-in {
   opacity: 1;
 }
-
 
 header {
   display: flex;
@@ -94,6 +120,7 @@ ion-icon {
   height: 30px;
   background-color: #31548c;
   color: #31548c;
+  
 }
 ion-icon:hover {
   cursor: pointer;
@@ -151,37 +178,54 @@ header a ion-icon {
   margin: 0px auto;
 }
 
+/* Product grid */
 .section2 .container {
-  display: flex;
-  width: 100%;
-  height: max-content;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
   justify-content: center;
-  margin: 10px auto;
 }
-.section2 .container .items {
-  margin: 10px;
-  width: 200px;
-  height: 350px;
-  background-color: #4c1c3c;
-  border: 2.5px solid #31548c;
-  border-radius: 12px;
+
+/* Product item */
+.section2 .items {
+  background: #4c1c3c;
+  padding: 12px;
+  border-radius: 25px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column; /* stack content vertically */
+  align-items: center;
+  justify-content: space-between;
 }
+
+.section2 .items:hover {
+  transform: translateY(-5px);
+}
+
+/* Responsive: 2 columns on small screens */
+@media (max-width: 768px) {
+  .section2 .container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .section2 .container .items .name {
   text-align: center;
   background-color: #b89bf0;
+  border-radius: 10px;
   height: 25px;
-  padding-top: 4px;
+  padding-top: 5px;
+  padding-right: 20px;
+  padding-left: 20px;
   color: #000;
   margin: 0;
 }
 .section2 .container .items .price {
-  float: left;
-  padding-left: 10px;
-  display: block;
-  width: 100%;
-  color: #ffba00;
-  font-weight: 650;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 8px 0;
+  color: #e63946;
 }
 .section2 .container .items .info {
   padding-left: 10px;
@@ -203,6 +247,39 @@ header a ion-icon {
   transform: scale(1.2);
   transition-duration: 0.8s;
   border-radius: 12px;
+}
+
+* Select button */
+.select-btn {
+  margin-top: 8px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #007bff;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+
+
+/* Responsive: adjust button & stacking */
+@media (max-width: 768px) {
+  .section2 .items {
+    padding: 10px;
+  }
+
+  .section2 .price {
+    font-size: 14px;
+  }
+
+  .select-btn {
+    width: 100%; /* full width button on mobile */
+    font-size: 13px;
+    padding: 10px;
+    margin-top: 10px;
+  }
 }
 footer {
   display: flex;
@@ -511,6 +588,7 @@ footer {
   border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
+  border-radius: 25px;
 }
 
 /* Modal wrapper */
@@ -523,9 +601,9 @@ footer {
   height: 100%; 
   background: rgba(0,0,0,0.7); 
   justify-content: center; 
-  align-items: flex-start; /* start at top */
+  align-items: flex-start; 
   padding: 20px; 
-  overflow-y: auto; /* allow scrolling */
+  overflow-y: auto;
   z-index: 2000;
 }
 
@@ -536,7 +614,7 @@ footer {
   border-radius: 12px;
   max-width: 500px;
   width: 100%;
-  margin: auto; /* centers on larger screens */
+  margin: auto;
   box-shadow: 0 6px 18px rgba(0,0,0,0.2);
 }
 
@@ -736,3 +814,178 @@ body {
   visibility: hidden;
   pointer-events: none;
 }
+
+/* Modal container */
+#checkout-modal {
+  display: none; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  justify-content: center;
+  align-items: flex-start; /* Start at top */
+  overflow-y: auto; /* Allow scrolling */
+  z-index: 9999;
+}
+
+/* Modal content */
+#checkout-modal .modal-content {
+  background: #bcccdc;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 90%;
+  margin: 60px auto; /* Push down */
+  text-align: center;
+  transform: translateY(-50px);
+  opacity: 0;
+  animation: slideDown 0.4s ease forwards;
+}
+
+/* Slide-down animation */
+@keyframes slideDown {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+
+/* Checkout Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+  background: #bcccdc;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  width: 90%;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.close-modal {
+  float: right;
+  font-size: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #b89bf0;
+  color: red;
+  border: none;
+}
+
+.close-modal:hover {
+  color: #ac8954;
+}
+
+/* Pay with Paystack button */
+.paystack-btn,#paystack-btn {
+  background: #31548c;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.pay-btn:hover {
+  background: #546e96;
+}
+
+.cart-incr,
+.cart-decr {
+  background: #546e96; 
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.cart-incr:hover,
+.cart-decr:hover {
+  background: #31548c;
+}
+
+.cart-decr {
+  background: #e63946; /* red */
+}
+
+.cart-decr:hover {
+  background: #b91c1c;
+}
+
+/* Remove button inside cart */
+.cart-remove {
+  background: transparent;
+  border: none;
+  color: #e63946;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: color 0.3s;
+}
+
+.cart-remove:hover {
+  color: #b91c1c;
+}
+
+/* Blur background when modal is active */
+body.modal-open main,
+body.modal-open header,
+body.modal-open footer,
+body.modal-open section {
+  filter: blur(5px);
+  pointer-events: none; /* Prevent clicking background */
+  user-select: none;
+}
+
+/* ===== button press/tap styling ===== */
+.select-btn,
+.cart-incr,
+.cart-decr {
+  transition: transform 0.12s cubic-bezier(.2,.9,.3,1), background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+/* hover lift (desktop) */
+.select-btn:hover { transform: translateY(-2px) scale(1.02); }
+
+/* pressed state for both CSS and JS fallback */
+.select-btn:active,
+.select-btn.pressed {
+  transform: translateY(0) scale(0.92) !important;
+}
+
+/* + and - buttons pressed */
+.cart-incr:active, .cart-decr:active,
+.cart-incr.pressed, .cart-decr.pressed {
+  transform: scale(0.92) !important;
+}
+
+/* prevent old keyframe or animation from interfering */
+.select-btn:active { animation: none !important; }
+
+/* optional color tweaks (already in your file, leave if present) */
+.cart-incr { background: #007bff; color: #fff; }
+.cart-decr { background: #e63946; color: #fff; }

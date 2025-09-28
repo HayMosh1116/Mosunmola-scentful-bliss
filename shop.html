@@ -47,23 +47,7 @@
   <!-- Shop Section -->
 <section>
     <div class="section">
-      <div class="section1">
-       <div class="slider container">
-         <div class="img-slider">
-          <img src="fragrance-3619762_1280.jpg" alt="" class="img">
-          <img src="perfume-1794111_1280.jpg" alt="" class="img">
-          <img src="perfume-2445617_1280.jpg" alt="" class="img">
-          <img src="white-2539959_1280.jpg" alt="" class="img">
-          <img src="jewels-1090711_1280.jpg" alt="" class="img">
-           <img src="boxer and singlet.jpg" alt="" class="img">
-          <img src="amber-necklace-6935692_1280.png" alt="" class="img">
-          <img src="amber-necklace-6935694_1280.jpg" alt="" class="img">
-          <img src="aerosol-5180859_1280.jpg" alt="" class="img">                          <img src="c boxer.png" alt="" class="img">
-          <img src="deodorant-4620779_1280.jpg" alt="" class="img">
-          <img src="boxer.jpg" alt="" class="img">
-        </div>
-       </div>
-      </div>
+     
       <div class="section2">
         <div class="container">
           <div class="items">
@@ -87,7 +71,7 @@
           </div>
           <div class="items"> 
             <div class="img img1"><img src="black-diamond.png" alt=""></div>
-            <div class="name">Black Diamond</div>
+            <div class="name">B Diamond</div>
             <div class="price">₦8000</div>
             <div class="info">A bold and sophisticated scent for special moments.</div>
           </div>
@@ -159,7 +143,7 @@
             <div class="info">A delightful perfume with a blend of floral and fruity notes.</div>
           </div>
           <div class="items">
-            <div class="img img1"><img src="sara-perf.jpg" alt=""></div>
+            <div class="img img1"><img src="sara.jpg" alt=""></div>
             <div class="name">SARA PERF</div>
             <div class="price">₦4000</div>
             <div class="info">A refreshing perfume with a subtle floral aroma.</div>
@@ -190,27 +174,20 @@
 </div>
 
 <!-- Checkout modal -->
-<div id="checkout-modal" class="checkout-modal">
-  <div class="checkout-content">
-
+<div id="checkout-modal">
+  <div class="modal-content">
+    <span class="close-modal" style="float:right; font-size:20px; cursor:pointer;">&times;</span>
     <h3>Payment Instructions</h3>
-    <p>Please send payment to this account:</p>
-    <p><b>Account Name:</b>AJARAT BOLANLE RAJI</p>
-    <p><b>Account Number:</b> 906 528 1232</p>
-    <p><b>Bank:</b> Opay Bank</p>
+    <p>Proceed with Paystack to complete your payment.</p>
 
     <h3>Your Cart</h3>
     <div id="cart-summary"></div>
 
-     <p><b>Upload Payment Screenshot:</b></p>
-    <input type="file" id="payment-screenshot" accept="image/*"><br><br>
-    <img id="screenshot-preview" src="" style="max-width:100%; display:none; border:1px solid #ccc; margin-top:10px;">
     <br>
-<button id="download-pdf" style="display:none;">Download PDF</button>
-<br><br>
-<button id="confirm-payment">Click here to go to WhatsApp and attach your screenshot</button>
-<br><br>
-<button onclick="document.getElementById('checkout-modal').style.display='none'">Close</button>
+    <button id="paystack-btn">Pay with Bank Transfer</button>
+    <br><br>
+<button class="close-modal" onclick="document.getElementById('checkout-modal').style.display='none'">Close</button>
+
   </div>
 </div>
 
@@ -241,8 +218,11 @@
 
     <div class="footer3">Copyright © <h4>HAYMOSH</h4> 2025</div>
   </footer>
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
   <script src="script.js"></script>
+
 
 </body>
 </html>

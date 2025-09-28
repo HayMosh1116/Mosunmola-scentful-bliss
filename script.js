@@ -1,3 +1,5 @@
+let cart = []; // global shopping cart
+
 // Fade in page on load
 window.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("fade-in");
@@ -6,7 +8,6 @@ window.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("load", () => {
   document.getElementById("page-loader").classList.add("hide");
 });
-
 
 // MENU TOGGLE
 const menu = document.querySelector(".menu");
@@ -35,7 +36,6 @@ function showSlide() {
 }
 
 setInterval(showSlide, 4000); // every 4 seconds
-
 
 // SEARCH FUNCTION
 const searchBar = document.getElementById("search-bar");
@@ -70,21 +70,96 @@ if (searchBar) {
   });
 }
 
+// ---------- CART FUNCTIONS ----------
+function formatMoney(n) {
+  if (n >= 1000) {
+    return `₦${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+  }
+  return `₦${n}`;
+}
 
+function parsePrice(text) {
+  const n = parseFloat(String(text).replace(/[^0-9.]/g, ""));
+  return isNaN(n) ? 0 : n;
+}
 
-// script.js
+function findInCart(id) {
+  return cart.find((p) => p.id === id);
+}
+
+function updateProductButton(id) {
+  const itemEl = document.querySelector(`.items[data-id="${id}"]`);
+  if (!itemEl) return;
+  const btn = itemEl.querySelector(".select-btn");
+  const product = findInCart(id);
+
+  if (!btn) return;
+
+  if (product) {
+    btn.classList.add("selected");
+    btn.textContent = `Selected (${product.quantity})`;
+  } else {
+    btn.classList.remove("selected");
+    btn.textContent = "Select";
+  }
+}
+
+function updateCartCountAndTotal() {
+  const cartCountEl = document.getElementById("cart-count");
+  const cartTotalEl = document.getElementById("cart-total");
+
+  const totalQty = cart.reduce((s, it) => s + it.quantity, 0);
+  const totalPrice = cart.reduce((s, it) => s + it.quantity * it.price, 0);
+
+  if (cartCountEl) cartCountEl.textContent = `Selected items: ${totalQty}`;
+  if (cartTotalEl) cartTotalEl.textContent = `Total: ${formatMoney(totalPrice)}`;
+}
+
+function renderCartSummary() {
+  const cartSummary = document.getElementById("cart-summary");
+  if (!cartSummary) return;
+  cartSummary.innerHTML = "";
+
+  if (cart.length === 0) {
+    cartSummary.innerHTML = "<p>No items selected.</p>";
+    return;
+  }
+
+  cart.forEach((item) => {
+    const row = document.createElement("div");
+    row.className = "cart-row";
+    row.style.margin = "10px 0";
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+        <div style="min-width:140px;"><b>${item.name}</b></div>
+        <div>${formatMoney(item.price)}</div>
+        <div>
+          <button class="cart-decr" data-id="${item.id}">-</button>
+          <span class="cart-qty" data-id="${item.id}" style="margin:0 8px;">${item.quantity}</span>
+          <button class="cart-incr" data-id="${item.id}">+</button>
+        </div>
+        <div style="min-width:80px;">Subtotal: <b>${formatMoney(item.price * item.quantity)}</b></div>
+      </div>
+    `;
+    cartSummary.appendChild(row);
+  });
+
+  const total = cart.reduce((s, it) => s + it.price * it.quantity, 0);
+  const totalDiv = document.createElement("p");
+  totalDiv.innerHTML = `<b>Total: ${formatMoney(total)}</b>`;
+  cartSummary.appendChild(totalDiv);
+}
+
+// ---------- EVENT HANDLERS ----------
 document.addEventListener("DOMContentLoaded", () => {
   const itemsEls = Array.from(document.querySelectorAll(".items"));
   const checkoutBtn = document.getElementById("checkout-btn");
   const checkoutModal = document.getElementById("checkout-modal");
-  const cartSummary = document.getElementById("cart-summary");
   const screenshotInput = document.getElementById("payment-screenshot");
   const screenshotPreview = document.getElementById("screenshot-preview");
   const confirmPaymentBtn = document.getElementById("confirm-payment");
-  const cartCountEl = document.getElementById("cart-count");
-  const cartTotalEl = document.getElementById("cart-total");
 
-  // assign data-id to each product and ensure a select button exists
+  // assign data-id and ensure select button exists
   itemsEls.forEach((el, idx) => {
     el.dataset.id = String(idx);
 
@@ -96,116 +171,28 @@ document.addEventListener("DOMContentLoaded", () => {
       el.appendChild(btn);
     }
     btn.dataset.id = String(idx);
-  });
 
-  let cart = []; // { id: "0", name, price: number, quantity: number }
-
-  function formatMoney(n) {
-  if (n >= 1000) {
-    return `₦${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`;
-  }
-  return `₦${n}`;
-}
-
-
-
-
-  function parsePrice(text) {
-    // remove anything that's not a digit or dot
-    const n = parseFloat(String(text).replace(/[^0-9.]/g, ""));
-    return isNaN(n) ? 0 : n;
-  }
-
-  function findInCart(id) {
-    return cart.find((p) => p.id === id);
-  }
-
-  function updateProductButton(id) {
-    const itemEl = document.querySelector(`.items[data-id="${id}"]`);
-    if (!itemEl) return;
-    const btn = itemEl.querySelector(".select-btn");
-    const product = findInCart(id);
-
-    if (!btn) return;
-
-    if (product) {
-      btn.classList.add("selected");
-      btn.textContent = `Selected (${product.quantity})`;
-    } else {
-      btn.classList.remove("selected");
-      btn.textContent = "Select";
-    }
-  }
-
-  function updateCartCountAndTotal() {
-    const totalQty = cart.reduce((s, it) => s + it.quantity, 0);
-    const totalPrice = cart.reduce((s, it) => s + it.quantity * it.price, 0);
-
-    if (cartCountEl) cartCountEl.textContent = `Selected items: ${totalQty}`;
-    if (cartTotalEl) cartTotalEl.textContent = `Total: ${formatMoney(totalPrice)}`;
-  }
-
-  // create click handlers for select buttons
-  document.querySelectorAll(".select-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const id = btn.dataset.id;
-      const itemEl = document.querySelector(`.items[data-id="${id}"]`);
-      if (!itemEl) return;
-
-      const name = (itemEl.querySelector(".name")?.innerText || "Item").trim();
-      const priceText = itemEl.querySelector(".price")?.innerText || "0";
+    // attach click to select button
+    btn.addEventListener("click", () => {
+      const name = (el.querySelector(".name")?.innerText || "Item").trim();
+      const priceText = el.querySelector(".price")?.innerText || "0";
       const price = parsePrice(priceText);
 
-      let product = findInCart(id);
+      let product = findInCart(el.dataset.id);
       if (!product) {
-        product = { id, name, price, quantity: 1 };
+        product = { id: el.dataset.id, name, price, quantity: 1 };
         cart.push(product);
       } else {
-        // clicking select again increments quantity
         product.quantity++;
       }
 
-      updateProductButton(id);
+      updateProductButton(el.dataset.id);
       updateCartCountAndTotal();
     });
   });
 
-  function renderCartSummary() {
-    if (!cartSummary) return;
-    cartSummary.innerHTML = "";
-
-    if (cart.length === 0) {
-      cartSummary.innerHTML = "<p>No items selected.</p>";
-      return;
-    }
-
-    cart.forEach((item) => {
-      const row = document.createElement("div");
-      row.className = "cart-row";
-      row.style.margin = "10px 0";
-      row.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
-          <div style="min-width:140px;"><b>${item.name}</b></div>
-          <div>${formatMoney(item.price)}</div>
-          <div>
-            <button class="cart-decr" data-id="${item.id}">-</button>
-            <span class="cart-qty" data-id="${item.id}" style="margin:0 8px;">${item.quantity}</span>
-            <button class="cart-incr" data-id="${item.id}">+</button>
-          </div>
-          <div style="min-width:80px;">Subtotal: <b>${formatMoney(item.price * item.quantity)}</b></div>
-        </div>
-      `;
-      cartSummary.appendChild(row);
-    });
-
-    // total
-    const total = cart.reduce((s, it) => s + it.price * it.quantity, 0);
-    const totalDiv = document.createElement("p");
-    totalDiv.innerHTML = `<b>Total: ${formatMoney(total)}</b>`;
-    cartSummary.appendChild(totalDiv);
-  }
-
-  // event delegation for cart +/- clicks
+  // event delegation for +/- inside cart modal
+  const cartSummary = document.getElementById("cart-summary");
   if (cartSummary) {
     cartSummary.addEventListener("click", (e) => {
       const target = e.target;
@@ -220,11 +207,8 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (target.classList.contains("cart-decr")) {
         product.quantity--;
         if (product.quantity <= 0) {
-          // remove from cart
           cart = cart.filter((p) => p.id !== id);
         }
-      } else {
-        return;
       }
 
       updateProductButton(id);
@@ -263,105 +247,110 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // confirm payment -> open WhatsApp with order summary
-  document.getElementById("confirm-payment").addEventListener("click", () => {
-  let summary = "🛒 Your Order Summary:\n\n";
+  // confirm payment -> WhatsApp
+  if (confirmPaymentBtn) {
+    confirmPaymentBtn.addEventListener("click", () => {
+      let summary = "🛒 Your Order Summary:\n\n";
 
-  cart.forEach(item => {
-    summary += `- ${item.quantity}x ${item.name} = ${formatMoney(item.price * item.quantity)}\n`;
+      cart.forEach(item => {
+        summary += `- ${item.quantity}x ${item.name} = ${formatMoney(item.price * item.quantity)}\n`;
+      });
+
+      summary += `\nTotal: ${formatMoney(cart.reduce((s, it) => s + it.price * it.quantity, 0))}`;
+      summary += `\n\n✅ Please attach your payment screenshot here.`;
+
+      const whatsappNumber = "2349013921076";
+      const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(summary)}`;
+
+      window.open(url, "_blank");
+    });
+  }
+
+  // ---------- PAYSTACK ----------
+  const payBtn = document.getElementById("paystack-btn");
+  if (payBtn) {
+    payBtn.addEventListener("click", () => {
+      const amount = cart.reduce((s, it) => s + it.price * it.quantity, 0);
+
+      if (amount <= 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+
+      var handler = PaystackPop.setup({
+        key: "pk_test_7dfafd756e0da36a66cc8cc84d39de38ecc98dcc", 
+        email: "customer@example.com",
+        amount: Math.round(amount * 100),
+        currency: "NGN",
+        channels: ["bank"],
+        metadata: {
+          custom_fields: cart.map(item => ({ 
+            display_name: item.name,
+            variable_name: item.name,
+            value: `Qty: ${item.quantity}, Subtotal: ₦${item.price * item.quantity}`
+          }))
+        },
+        callback: function (response) {
+          alert("✅ Payment complete! Ref: " + response.reference + "\nTotal Paid: ₦" + amount);
+        },
+        onClose: function () {
+          alert("Payment window closed.");
+        }
+      });
+
+      handler.openIframe();
+    });
+  }
+
+  // --- Press/tap fallback: add 'pressed' class on pointerdown, remove on release ---
+(function addPressedHandlers() {
+  const selectors = ['.select-btn', '.cart-incr', '.cart-decr'];
+
+  document.addEventListener('pointerdown', (e) => {
+    const btn = e.target.closest(selectors.join(','));
+    if (!btn) return;
+    btn.classList.add('pressed');
   });
 
-  summary += `\nTotal: ${formatMoney(cart.reduce((s, it) => s + it.price * it.quantity, 0))}`;
-  summary += `\n\n✅ Please attach your payment screenshot here.`;
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(evt => {
+    document.addEventListener(evt, (e) => {
+      const btn = e.target.closest(selectors.join(','));
+      if (!btn) return;
+      btn.classList.remove('pressed');
+    });
+  });
 
-  const whatsappNumber = "2349013921076"; // <-- replace with your number
-  const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(summary)}`;
+  // For older browsers that don't support pointer events, fallback to touch events
+  document.addEventListener('touchstart', (e) => {
+    const btn = e.target.closest(selectors.join(','));
+    if (btn) btn.classList.add('pressed');
+  }, {passive: true});
 
-  window.open(url, "_blank");
-});
+  ['touchend','touchcancel'].forEach(evt => {
+    document.addEventListener(evt, (e) => {
+      const btn = e.target.closest(selectors.join(','));
+      if (btn) btn.classList.remove('pressed');
+    });
+  });
+})();
 
-// Preview uploaded screenshot
-document.getElementById("payment-screenshot").addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      const img = document.getElementById("screenshot-preview");
-      img.src = event.target.result;
-      img.style.display = "block";
-
-      // Show the "Download PDF" button once image is uploaded
-      document.getElementById("download-pdf").style.display = "inline-block";
-    };
-    reader.readAsDataURL(file);
-  }
-});
-
-document.getElementById("download-pdf").addEventListener("click", () => {
-  const img = document.getElementById("screenshot-preview");
-  if (!img.src) {
-    alert("Please upload a screenshot first.");
-    return;
-  }
-
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF("p", "mm", "a4"); // portrait, millimeters, A4
-
-  // Get page width
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-
-  // Adjust image size
-  const imgWidth = pageWidth - 20; // leave margins
-  const imgHeight = (img.naturalHeight / img.naturalWidth) * imgWidth;
-
-  pdf.addImage(img.src, "PNG", 10, 10, imgWidth, imgHeight);
-
-  pdf.save("payment-proof.pdf");
-});
-
-
-
-  // initial update
   updateCartCountAndTotal();
 });
 
-// loader control: put this near the bottom of script.js
-(function () {
-  const loader = document.getElementById('page-loader');
+// Close checkout modal
+const checkoutModal = document.getElementById("checkout-modal");
+const closeModal = document.querySelector(".close-modal");
 
-  // debug helper (open console to see messages)
-  console.log('Loader element found:', !!loader);
-
-  // Hide loader when window fully loaded
-  window.addEventListener('load', () => {
-    console.log('window load event fired — hiding loader');
-    if (loader) loader.classList.add('hide');
+if (closeModal) {
+  closeModal.addEventListener("click", () => {
+    checkoutModal.style.display = "none";
   });
+}
 
-  // Safety fallback: if load event never fires, hide after 5s
-  setTimeout(() => {
-    if (loader && !loader.classList.contains('hide')) {
-      console.warn('Fallback: hiding loader after timeout');
-      loader.classList.add('hide');
-    }
-  }, 5000);
+// Close modal if clicking outside content
+window.addEventListener("click", (e) => {
+  if (e.target === checkoutModal) {
+    this.checkoutModal.style.display = "none";
+  }
+});
 
-  // Show loader when clicking internal links (so user sees spinner during navigation)
-  document.addEventListener('click', (e) => {
-    const a = e.target.closest('a');
-    if (!a) return;
-    // only show for same-origin and not anchor-only links
-    try {
-      const url = new URL(a.href, location.href);
-      const isSameOrigin = url.origin === location.origin;
-      const isHashOnly = url.pathname === location.pathname && url.hash && !url.search;
-      if (isSameOrigin && !isHashOnly && !a.hasAttribute('target')) {
-        // small delay to allow the click to trigger navigation; show spinner immediately
-        if (loader) loader.classList.remove('hide');
-      }
-    } catch (err) {
-      // invalid URL — ignore
-    }
-  });
-})();

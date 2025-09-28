@@ -989,3 +989,17 @@ body.modal-open section {
 /* optional color tweaks (already in your file, leave if present) */
 .cart-incr { background: #007bff; color: #fff; }
 .cart-decr { background: #e63946; color: #fff; }
+
+
+/* Initial hidden state */
+.items {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+/* Reveal when in view */
+.items.show {
+  opacity: 1;
+  transform: translateY(0);
+}

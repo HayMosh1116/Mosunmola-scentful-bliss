@@ -354,3 +354,17 @@ window.addEventListener("click", (e) => {
   }
 });
 
+// Scroll reveal for product items
+document.addEventListener("DOMContentLoaded", () => {
+  const items = document.querySelectorAll(".items");
+
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("show");
+      }
+    });
+  }, { threshold: 0.2 }); 
+
+  items.forEach(item => observer.observe(item));
+});
